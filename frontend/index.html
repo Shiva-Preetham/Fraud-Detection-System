@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fraud Detection Ops Center</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111412;
+      --panel: #20231f;
+      --panel-2: #292d28;
+      --line: #3b413a;
+      --text: #f3f0e8;
+      --muted: #b8b8aa;
+      --green: #1fbf84;
+      --red: #e85d5d;
+      --amber: #d99b20;
+      --violet: #9a8cff;
+      --cyan: #55c7d8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    .topbar, .grid, .metric-grid, .pipeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .topbar {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    h1, h2, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 24px;
+      line-height: 1.2;
+    }
+
+    h2 {
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .live {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .metric-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 14px;
+    }
+
+    .metric, .panel, .stage {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .metric {
+      padding: 16px;
+      min-height: 96px;
+    }
+
+    .metric label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .metric span {
+      color: var(--green);
+      display: block;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .metric.danger strong,
+    .metric.danger span {
+      color: var(--red);
+    }
+
+    .grid {
+      grid-template-columns: 1.1fr 1fr;
+      align-items: stretch;
+    }
+
+    .panel {
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .transactions {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .txn {
+      display: grid;
+      grid-template-columns: 1.3fr .9fr .9fr .8fr;
+      gap: 10px;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      font-weight: 700;
+      min-height: 34px;
+    }
+
+    .pill {
+      border-radius: 8px;
+      padding: 5px 8px;
+      text-align: center;
+      font-size: 12px;
+      background: #f3f0e8;
+      color: #1f241f;
+    }
+
+    .pill.fraud {
+      color: #9d2525;
+    }
+
+    .pill.legit {
+      color: #337327;
+    }
+
+    .bars {
+      display: grid;
+      gap: 13px;
+      margin-top: 16px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 130px 1fr 62px;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 8px;
+      background: #151815;
+      overflow: hidden;
+    }
+
+    .bar div {
+      height: 100%;
+      border-radius: 8px;
+      background: var(--green);
+    }
+
+    .heatmap {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-top: 12px;
+    }
+
+    .cell {
+      min-height: 12px;
+      border-radius: 3px;
+      background: #dcebd1;
+    }
+
+    .alert-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .alert {
+      display: grid;
+      grid-template-columns: 10px 1fr;
+      gap: 10px;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      margin-top: 6px;
+      border-radius: 8px;
+      background: var(--amber);
+    }
+
+    .dot.critical {
+      background: var(--red);
+    }
+
+    .pipeline {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      margin-top: 14px;
+    }
+
+    .stage {
+      padding: 12px;
+      background: var(--panel-2);
+      min-height: 78px;
+    }
+
+    .stage strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .stage span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 860px) {
+      main {
+        width: min(100% - 20px, 680px);
+      }
+
+      .metric-grid,
+      .grid,
+      .pipeline {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .txn {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="topbar">
+      <div>
+        <h1>Fraud detection ops center</h1>
+        <h2>Kafka stream -> Spark features -> ML risk score -> lake, SQL, alerts</h2>
+      </div>
+      <div class="live">Live - updating</div>
+    </div>
+
+    <section class="metric-grid">
+      <article class="metric">
+        <label>Transactions today</label>
+        <strong id="transactionsToday">0</strong>
+        <span>+12.4% vs yesterday</span>
+      </article>
+      <article class="metric danger">
+        <label>Fraud flagged</label>
+        <strong id="fraudFlagged">0</strong>
+        <span>0.13% of volume</span>
+      </article>
+      <article class="metric">
+        <label>Model F1-score</label>
+        <strong id="f1Score">0.000</strong>
+        <span id="precisionRecall">Precision 0.00 - Recall 0.00</span>
+      </article>
+      <article class="metric">
+        <label>Avg risk score</label>
+        <strong id="avgRisk">0.000</strong>
+        <span id="threshold">Threshold 0.65</span>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <h2>Live transaction stream</h2>
+        <div id="transactions" class="transactions"></div>
+      </article>
+
+      <article class="panel">
+        <h2>Model performance</h2>
+        <div class="bars">
+          <div class="bar-row"><span>Precision</span><div class="bar"><div id="precisionBar"></div></div><strong id="precisionText">0%</strong></div>
+          <div class="bar-row"><span>Recall</span><div class="bar"><div id="recallBar"></div></div><strong id="recallText">0%</strong></div>
+          <div class="bar-row"><span>F1</span><div class="bar"><div id="f1Bar"></div></div><strong id="f1Text">0%</strong></div>
+          <div class="bar-row"><span>AUC-ROC</span><div class="bar"><div id="aucBar"></div></div><strong id="aucText">0%</strong></div>
+          <div class="bar-row"><span>Latency</span><div class="bar"><div style="width:76%;background:var(--amber)"></div></div><strong>38ms</strong></div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2>Fraud heatmap by hour - last 7 days</h2>
+        <div id="heatmap" class="heatmap"></div>
+      </article>
+
+      <article class="panel">
+        <h2>Alert log</h2>
+        <div id="alerts" class="alert-list"></div>
+      </article>
+    </section>
+
+    <section class="pipeline">
+      <article class="stage"><strong>Kafka</strong><span>Transaction topic with card, merchant, device, and location events.</span></article>
+      <article class="stage"><strong>Spark</strong><span>Micro-batches compute velocity, spend, geo, and device features.</span></article>
+      <article class="stage"><strong>ML scoring</strong><span>XGBoost plus Isolation Forest returns risk from 0 to 1.</span></article>
+      <article class="stage"><strong>S3 + Athena</strong><span>Bronze, silver, and gold Parquet tables for analyst SQL.</span></article>
+      <article class="stage"><strong>Alerts</strong><span>High-risk payments route to Lambda, SNS, Slack, or email.</span></article>
+    </section>
+  </main>
+
+  <script>
+    const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+    const number = new Intl.NumberFormat("en-IN");
+
+    function pct(value) {
+      return `${Math.round(value * 1000) / 10}%`;
+    }
+
+    function setBar(id, value) {
+      document.getElementById(id).style.width = `${Math.max(0, Math.min(value * 100, 100))}%`;
+    }
+
+    function riskColor(risk) {
+      if (risk > 0.72) return "#b72e35";
+      if (risk > 0.45) return "#d99b20";
+      return "#dcebd1";
+    }
+
+    function render(summary) {
+      document.getElementById("transactionsToday").textContent = number.format(summary.transactions_today);
+      document.getElementById("fraudFlagged").textContent = number.format(summary.fraud_flagged);
+      document.getElementById("avgRisk").textContent = summary.avg_risk_score.toFixed(3);
+      document.getElementById("threshold").textContent = `Threshold ${summary.threshold}`;
+
+      const metrics = summary.metrics;
+      document.getElementById("f1Score").textContent = metrics.f1.toFixed(3);
+      document.getElementById("precisionRecall").textContent = `Precision ${metrics.precision.toFixed(2)} - Recall ${metrics.recall.toFixed(2)}`;
+      [["precision", "precision"], ["recall", "recall"], ["f1", "f1"], ["auc", "auc_roc"]].forEach(([prefix, key]) => {
+        setBar(`${prefix}Bar`, metrics[key]);
+        document.getElementById(`${prefix}Text`).textContent = pct(metrics[key]);
+      });
+
+      document.getElementById("transactions").innerHTML = summary.recent_transactions.slice(0, 7).map((row) => `
+        <div class="txn">
+          <span>${row.txn_id}</span>
+          <span>${currency.format(row.amount)}</span>
+          <span class="pill">score: ${row.risk_score.toFixed(2)}</span>
+          <span class="pill ${row.prediction === "FRAUD" ? "fraud" : "legit"}">${row.prediction}</span>
+        </div>
+      `).join("");
+
+      document.getElementById("heatmap").innerHTML = summary.heatmap.map((cell) => `
+        <div class="cell" title="day ${cell.day}, hour ${cell.hour}, risk ${cell.risk}" style="background:${riskColor(cell.risk)}"></div>
+      `).join("");
+
+      const alerts = summary.recent_alerts.length ? summary.recent_alerts : [{ message: "No high-risk alerts in the current window.", severity: "normal" }];
+      document.getElementById("alerts").innerHTML = alerts.slice(0, 6).map((alert) => `
+        <div class="alert">
+          <span class="dot ${alert.severity === "critical" ? "critical" : ""}"></span>
+          <span>${alert.message}</span>
+        </div>
+      `).join("");
+    }
+
+    async function boot() {
+      const response = await fetch("/api/summary");
+      render(await response.json());
+      const stream = new EventSource("/api/stream");
+      stream.onmessage = (event) => render(JSON.parse(event.data).summary);
+    }
+
+    boot();
+  </script>
+</body>
+</html>
