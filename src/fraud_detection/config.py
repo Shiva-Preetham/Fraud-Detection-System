@@ -22,6 +22,7 @@ class Settings:
     lake_root: Path = _path_from_env("FRAUD_LAKE_ROOT", "data")
     model_path: Path = _path_from_env("FRAUD_MODEL_PATH", "models/fraud_model.joblib")
     alert_log_path: Path = _path_from_env("ALERT_LOG_PATH", "logs/alerts.jsonl")
+    olist_data_dir: Path = _path_from_env("OLIST_DATA_DIR", r"C:\Users\shiva\Downloads\archive (2)")
     aws_region: str = os.getenv("AWS_REGION", "ap-south-1")
     sns_topic_arn: str = os.getenv("SNS_TOPIC_ARN", "")
 
